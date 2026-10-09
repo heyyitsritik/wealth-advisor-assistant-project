@@ -76,7 +76,7 @@ def health_check() -> dict[str, str]:
     "/analyze",
     response_model=AnalysisResponse,
     responses={
-        500: {"description": "The analysis pipeline failed."},
+        500: {"description": "Unexpected server or report persistence failure."},
     },
 )
 def analyze_client(client: ClientFinancialData):
@@ -103,20 +103,17 @@ def analyze_client(client: ClientFinancialData):
                 "Analysis completed, but the report could not be persisted."
             )
 
-        if report.status == "failed":
-            return JSONResponse(
-                status_code=500,
-                content=report.model_dump(mode="json"),
-            )
-
         raise HTTPException(
             status_code=500,
-            detail="Analysis completed, but report persistence failed.",
-        )
+            detail=(
+                "The analysis report could not be persisted. "
+                "Please try again later."
+            ),
+        ) from None
 
     if report.status == "failed":
         return JSONResponse(
-            status_code=500,
+            status_code=200,
             content={
                 "report_id": report_id,
                 "report": report.model_dump(mode="json"),

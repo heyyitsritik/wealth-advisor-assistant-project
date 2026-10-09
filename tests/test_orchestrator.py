@@ -57,6 +57,11 @@ def test_orchestrator_returns_completed_report():
     assert report.status == "completed"
     assert report.client_id == "CLIENT-1001"
     assert report.summary is not None
+    assert report.limitations
+    assert any(
+        "transactions supplied" in limitation
+        for limitation in report.limitations
+    )
     assert report.summary.net_cash_flow == 1700
     assert len(report.anomalies) >= 1
     assert report.requires_human_review is True
@@ -101,3 +106,27 @@ def test_orchestrator_returns_failed_report_on_analysis_failure():
     assert report.client_id == "CLIENT-1001"
     assert report.summary is None
     assert report.errors
+
+def test_orchestrator_returns_helpful_error_on_invalid_analysis_data():
+    client = ClientFinancialData.model_validate(
+        json.loads(DATA_PATH.read_text(encoding="utf-8"))
+    )
+
+    class InvalidDataAnalyzer:
+        def run(self, fetched):
+            raise ValueError(
+                "Mixed-currency transactions require currency conversion."
+            )
+
+    report = build_orchestrator(
+        financial_tool=StaticFinancialDataTool(client),
+        analyzer=InvalidDataAnalyzer(),
+    ).run()
+
+    assert report.status == "failed"
+    assert report.summary is None
+    assert report.errors
+    assert "consistent currency" in report.errors[0]
+    assert "Mixed-currency transactions require currency conversion" not in (
+        report.errors[0]
+    )

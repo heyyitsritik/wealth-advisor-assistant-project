@@ -34,8 +34,25 @@ class OrchestratorAgent:
                 ],
             )
 
+
         try:
             analysis = self.analyzer.run(fetched)
+        except ValueError as exc:
+            logger.exception("Orchestrator: financial analysis validation failed")
+
+            error_message = (
+                "The supplied financial data could not be analyzed. "
+                "Check that all transactions use a consistent currency "
+                "and that the input data is valid."
+            )
+
+            return AdvisoryReport.create(
+                status="failed",
+                client_id=fetched.client.client_id,
+                crm_context=fetched.crm_context,
+                warnings=fetched.warnings,
+                errors=[error_message],
+            )
         except Exception:
             logger.exception("Orchestrator: financial analysis failed")
 
@@ -50,6 +67,7 @@ class OrchestratorAgent:
                 ],
             )
 
+
         requires_review = bool(
             analysis.anomalies or analysis.risk_signals
         )
@@ -62,6 +80,7 @@ class OrchestratorAgent:
             risk_signals=analysis.risk_signals,
             crm_context=fetched.crm_context,
             warnings=fetched.warnings,
+            limitations=analysis.limitations,
             requires_human_review=requires_review,
         )
 

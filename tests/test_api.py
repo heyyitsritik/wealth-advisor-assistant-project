@@ -1,6 +1,7 @@
 
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -59,7 +60,7 @@ def test_analyze_endpoint_reports_pipeline_failure():
 
     response = client.post("/analyze", json=data)
 
-    assert response.status_code == 500
+    assert response.status_code == 200
 
     payload = response.json()
 
@@ -69,3 +70,26 @@ def test_analyze_endpoint_reports_pipeline_failure():
     assert report["status"] == "failed"
     assert report["summary"] is None
     assert report["errors"]
+
+    retrieval_response = client.get(
+        f"/reports/{payload['report_id']}"
+    )
+
+    assert retrieval_response.status_code == 200
+
+
+def test_analyze_endpoint_handles_persistence_failure():
+    with patch(
+        "wealth_advisor.api.memory_store.save_report",
+        side_effect=RuntimeError("Simulated database outage"),
+    ):
+        response = client.post("/analyze", json=load_sample_data())
+
+    assert response.status_code == 500
+
+    payload = response.json()
+    assert payload["detail"] == (
+        "The analysis report could not be persisted. "
+        "Please try again later."
+    )
+    assert "report_id" not in payload

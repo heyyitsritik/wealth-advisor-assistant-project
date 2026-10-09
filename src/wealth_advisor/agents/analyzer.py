@@ -34,7 +34,6 @@ class AnalyzerAgent:
         currencies = sorted({txn.currency for txn in transactions})
 
         # Avoid combining amounts from different currencies.
-        # This implementation intentionally requires a single currency.
         if len(currencies) > 1:
             raise ValueError(
                 "Mixed-currency transactions require currency conversion "
@@ -79,6 +78,8 @@ class AnalyzerAgent:
             "An unusual amount is a review signal, not proof of fraud.",
             "Long-term spending trends cannot be established from this "
             "single-period sample.",
+            "Anomaly thresholds are heuristic and may be unreliable when "
+            "few comparison transactions are available.",
             "No investment recommendation is made by this analysis.",
         ]
 
@@ -100,20 +101,35 @@ class AnalyzerAgent:
 
     @staticmethod
     def _detect_anomalies(debits) -> list[TransactionAnomaly]:
+        """Flag large debits using a baseline that excludes the transaction."""
         if not debits:
             return []
 
-        amounts = [txn.amount for txn in debits]
-        typical_amount = Decimal(str(median(amounts)))
-
-        threshold = max(
-            MINIMUM_UNUSUAL_AMOUNT,
-            typical_amount * UNUSUAL_AMOUNT_MULTIPLIER,
-        )
-
         anomalies = []
 
-        for txn in debits:
+        for index, txn in enumerate(debits):
+            # Exclude the transaction being evaluated from its own baseline.
+            peer_amounts = [
+                other.amount
+                for peer_index, other in enumerate(debits)
+                if peer_index != index
+            ]
+
+            if peer_amounts:
+                typical_amount = Decimal(str(median(peer_amounts)))
+                threshold = max(
+                    MINIMUM_UNUSUAL_AMOUNT,
+                    typical_amount * UNUSUAL_AMOUNT_MULTIPLIER,
+                )
+                baseline_description = (
+                    f"median of other debit transactions "
+                    f"({typical_amount})"
+                )
+            else:
+                # With one debit, there is no peer baseline.
+                threshold = MINIMUM_UNUSUAL_AMOUNT
+                baseline_description = "minimum unusual-amount threshold"
+
             if txn.amount >= threshold:
                 anomalies.append(
                     TransactionAnomaly(
@@ -122,9 +138,10 @@ class AnalyzerAgent:
                         amount=txn.amount,
                         currency=txn.currency,
                         reason=(
-                            f"Debit amount is at least 5 times the median "
-                            f"debit amount ({typical_amount}) and meets the "
-                            f"minimum threshold ({MINIMUM_UNUSUAL_AMOUNT})."
+                            f"Debit amount meets or exceeds the threshold "
+                            f"({threshold}), based on the "
+                            f"{baseline_description} and minimum threshold "
+                            f"({MINIMUM_UNUSUAL_AMOUNT})."
                         ),
                         severity=(
                             "high"
