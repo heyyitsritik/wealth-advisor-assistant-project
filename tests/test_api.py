@@ -32,7 +32,10 @@ def test_analyze_endpoint_returns_structured_report():
 
     assert response.status_code == 200
 
-    report = response.json()
+    payload = response.json()
+
+    assert payload["report_id"]
+    report = payload["report"]
 
     assert report["status"] == "completed"
     assert report["client_id"] == "CLIENT-1001"
@@ -58,7 +61,10 @@ def test_analyze_endpoint_reports_pipeline_failure():
 
     assert response.status_code == 500
 
-    report = response.json()
+    payload = response.json()
+
+    assert payload["report_id"]
+    report = payload["report"]
 
     assert report["status"] == "failed"
     assert report["summary"] is None
