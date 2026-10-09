@@ -1,0 +1,137 @@
+
+{
+  "client_id": "CLIENT-1001",
+  "full_name": "Aarav Sharma",
+  "age": 35,
+  "monthly_income": "150000.00",
+  "accounts": [
+    {
+      "account_id": "ACC-001",
+      "account_type": "savings",
+      "balance": "850000.00",
+      "currency": "INR"
+    },
+    {
+      "account_id": "ACC-002",
+      "account_type": "investment",
+      "balance": "2400000.00",
+      "currency": "INR"
+    },
+    {
+      "account_id": "ACC-003",
+      "account_type": "credit_card",
+      "balance": "-12500.00",
+      "currency": "INR"
+    }
+  ],
+  "transactions": [
+    {
+      "transaction_id": "TXN-001",
+      "date": "2026-09-01",
+      "description": "Monthly salary",
+      "amount": "150000.00",
+      "currency": "INR",
+      "transaction_type": "credit",
+      "category": "income",
+      "merchant": "Employer"
+    },
+    {
+      "transaction_id": "TXN-002",
+      "date": "2026-09-03",
+      "description": "House rent",
+      "amount": "25000.00",
+      "currency": "INR",
+      "transaction_type": "debit",
+      "category": "housing",
+      "merchant": "Landlord"
+    },
+    {
+      "transaction_id": "TXN-003",
+      "date": "2026-09-05",
+      "description": "Grocery shopping",
+      "amount": "4200.00",
+      "currency": "INR",
+      "transaction_type": "debit",
+      "category": "groceries",
+      "merchant": "Supermarket"
+    },
+    {
+      "transaction_id": "TXN-004",
+      "date": "2026-09-08",
+      "description": "Electricity bill",
+      "amount": "1800.00",
+      "currency": "INR",
+      "transaction_type": "debit",
+      "category": "utilities",
+      "merchant": "Electricity provider"
+    },
+    {
+      "transaction_id": "TXN-005",
+      "date": "2026-09-12",
+      "description": "Restaurant dinner",
+      "amount": "2500.00",
+      "currency": "INR",
+      "transaction_type": "debit",
+      "category": "dining",
+      "merchant": "Restaurant"
+    },
+    {
+      "transaction_id": "TXN-006",
+      "date": "2026-09-15",
+      "description": "Online shopping",
+      "amount": "6800.00",
+      "currency": "INR",
+      "transaction_type": "debit",
+      "category": "shopping",
+      "merchant": "Online retailer"
+    },
+    {
+      "transaction_id": "TXN-007",
+      "date": "2026-09-18",
+      "description": "ATM withdrawal",
+      "amount": "5000.00",
+      "currency": "INR",
+      "transaction_type": "debit",
+      "category": "cash",
+      "merchant": "ATM"
+    },
+    {
+      "transaction_id": "TXN-008",
+      "date": "2026-09-22",
+      "description": "Electronics purchase",
+      "amount": "95000.00",
+      "currency": "INR",
+      "transaction_type": "debit",
+      "category": "electronics",
+      "merchant": "Electronics store"
+    },
+    {
+      "transaction_id": "TXN-009",
+      "date": "2026-09-25",
+      "description": "Investment contribution",
+      "amount": "20000.00",
+      "currency": "INR",
+      "transaction_type": "debit",
+      "category": "investment",
+      "merchant": "Investment platform"
+    },
+    {
+      "transaction_id": "TXN-010",
+      "date": "2026-09-27",
+      "description": "Freelance payment",
+      "amount": "12000.00",
+      "currency": "INR",
+      "transaction_type": "credit",
+      "category": "income",
+      "merchant": "Client"
+    }
+  ],
+  "risk_profile": {
+    "risk_tolerance": "moderate",
+    "investment_horizon_years": 15,
+    "investment_goals": [
+      "retirement",
+      "home_purchase"
+    ]
+  }
+}
